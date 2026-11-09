@@ -1,0 +1,40 @@
+name: 🗺️ Proposer un tracé
+description: Le parcours d'une course (OpenRunner, Strava, Komoot, Garmin, RideWithGPS…)
+title: "[Tracé] "
+labels: ["tracé"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une fois relu, le tracé est ajouté automatiquement sur la page de la course, et repris pour les éditions suivantes si le parcours ne change pas.
+  - type: input
+    id: course
+    attributes:
+      label: Page de la course
+      description: Adresse de la page sur coursesducoin.fr
+      placeholder: https://www.coursesducoin.fr/courses/…
+    validations:
+      required: true
+  - type: input
+    id: lien
+    attributes:
+      label: Lien vers le tracé
+      description: Adresse publique commençant par https://
+      placeholder: https://…
+    validations:
+      required: true
+  - type: dropdown
+    id: portee
+    attributes:
+      label: Le parcours change-t-il d'une année sur l'autre ?
+      options:
+        - Non, même parcours chaque année
+        - Oui, valable pour cette édition seulement
+        - Je ne sais pas
+    validations:
+      required: true
+  - type: textarea
+    id: commentaire
+    attributes:
+      label: Commentaire (facultatif)
+      description: Distance, nombre de tours, catégorie concernée…

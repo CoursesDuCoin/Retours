@@ -1,0 +1,17 @@
+name: 💡 Proposer une fonctionnalité
+description: Une idée pour améliorer le site
+title: "[Idée] "
+labels: ["idée"]
+body:
+  - type: textarea
+    id: idee
+    attributes:
+      label: Votre idée
+      description: Ce que vous aimeriez pouvoir faire sur le site
+    validations:
+      required: true
+  - type: textarea
+    id: pourquoi
+    attributes:
+      label: Pourquoi ? (facultatif)
+      description: Dans quelle situation cela vous servirait

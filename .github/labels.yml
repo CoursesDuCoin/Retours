@@ -1,0 +1,34 @@
+# Étiquettes du dépôt (à créer une fois dans GitHub > Issues > Labels)
+- name: erreur
+  color: d73a4a
+  description: Information fausse sur une course
+- name: manquante
+  color: e99695
+  description: Course absente du calendrier
+- name: tracé
+  color: 0e8a16
+  description: Proposition de parcours
+- name: résultats
+  color: fbca04
+  description: Proposition de lien vers les résultats
+- name: idée
+  color: a2eeef
+  description: Proposition de fonctionnalité
+- name: site
+  color: 1d76db
+  description: Problème d'affichage ou de fonctionnement du site
+- name: autre
+  color: ededed
+  description: Le reste
+- name: validé
+  color: 2ea44f
+  description: Relu, prêt à être ajouté automatiquement
+- name: refusé
+  color: 6a737d
+  description: Non retenu (raison en commentaire)
+- name: édition-seule
+  color: c5def5
+  description: Tracé valable pour cette édition seulement
+- name: à-corriger
+  color: b60205
+  description: L'ajout automatique a échoué, voir le commentaire
