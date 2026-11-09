@@ -1,4 +1,4 @@
-# Étiquettes du dépôt (à créer une fois dans GitHub > Issues > Labels)
+# Étiquettes du dépôt, créées automatiquement par .github/workflows/labels.yml
 - name: erreur
   color: d73a4a
   description: Information fausse sur une course

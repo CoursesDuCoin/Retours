@@ -1,0 +1,28 @@
+# Crée ou met à jour les étiquettes décrites dans .github/labels.yml
+name: Étiquettes
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/labels.yml, .github/workflows/labels.yml]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Créer / mettre à jour les étiquettes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(yq 'length' .github/labels.yml)
+          for i in $(seq 0 $((count - 1))); do
+            name=$(yq ".[$i].name" .github/labels.yml)
+            color=$(yq ".[$i].color" .github/labels.yml)
+            description=$(yq ".[$i].description" .github/labels.yml)
+            gh label create "$name" --color "$color" --description "$description" --force --repo "$GITHUB_REPOSITORY"
+          done
