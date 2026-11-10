@@ -18,7 +18,7 @@ Indiquez l'adresse de la page de la course quand c'est possible (par ex. `https:
 ## Ce qui se passe ensuite
 
 1. Nous relisons chaque ticket.
-2. Pour un tracé ou des résultats, un robot vérifie d’abord que le lien s’ouvre sans être connecté (`lien-vérifié`, sinon `à-corriger` avec une explication) ; pour un tracé, il vérifie aussi que le lien mène vers un site de parcours connu (OpenRunner, Komoot, RideWithGPS, Visorando…), sinon il le signale pour relecture. Une fois relu et validé, le lien (résultats, tracé) est ajouté automatiquement sur la page de la course, puis le ticket est fermé avec un commentaire.
+2. Pour un tracé ou des résultats, un robot vérifie d’abord que le lien s’ouvre sans être connecté (`lien-vérifié`, sinon `à-corriger` avec une explication) ; pour un tracé, il vérifie aussi que le lien mène vers un site de parcours connu (OpenRunner, Komoot, RideWithGPS, Visorando…), sinon il le signale pour relecture. Une fois relu et validé, le tracé est ajouté automatiquement sur la page de la course dans l’heure, puis le ticket est fermé avec un commentaire.
 3. Une erreur est corrigée à la source quand c'est possible (les données viennent des calendriers des fédérations).
 
 ## Vie privée
