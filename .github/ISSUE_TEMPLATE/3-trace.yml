@@ -19,7 +19,7 @@ body:
     id: lien
     attributes:
       label: Lien vers le tracé
-      description: Le tracé doit être public (visible sans compte ni connexion). Adresse commençant par https://
+      description: Le tracé doit s'ouvrir sans être connecté. Les activités Strava demandent souvent une connexion : préférez OpenRunner, Komoot ou RideWithGPS. Adresse commençant par https://
       placeholder: https://…
     validations:
       required: true
