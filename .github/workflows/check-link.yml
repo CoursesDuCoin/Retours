@@ -41,6 +41,22 @@ jobs:
             | awk '/^### /{insec = ($0 ~ /^### Lien vers/); next} insec && /^https?:\/\//{print $1; exit}')
 
           reason=""
+          unknown=""
+          host=$(echo "$link" | sed -E 's#^https?://([^/:?#]+).*#\1#' | tr 'A-Z' 'a-z' | sed 's/^www\.//')
+          # Tracé : le lien doit mener vers un site de parcours connu
+          if [ -n "$link" ] && [[ ",$labels," == *,tracé,* ]]; then
+            case "$host" in
+              openrunner.com|*.openrunner.com|komoot.com|*.komoot.com|komoot.fr|*.komoot.fr|komoot.de|\
+              ridewithgps.com|*.ridewithgps.com|strava.com|*.strava.com|strava.app.link|\
+              visorando.com|*.visorando.com|wikiloc.com|*.wikiloc.com|alltrails.com|*.alltrails.com|\
+              outdooractive.com|*.outdooractive.com|tracegps.com|*.tracegps.com|utagawavtt.com|*.utagawavtt.com|\
+              connect.garmin.com|gpsies.com|*.gpsies.com|calimoto.com|*.calimoto.com|bikemap.net|*.bikemap.net|\
+              plotaroute.com|*.plotaroute.com|veloenfrance.fr|*.veloenfrance.fr|openstreetmap.org|*.openstreetmap.org|\
+              geovelo.app|*.geovelo.app|geovelo.fr|*.geovelo.fr|cartovelo.fr|*.cartovelo.fr) ;;
+              *) unknown="yes" ;;
+            esac
+          fi
+
           if [ -z "$link" ]; then
             reason="Aucun lien trouvé dans le ticket (il doit commencer par https://)."
           else
@@ -64,7 +80,12 @@ jobs:
             fi
           fi
 
-          if [ -z "$reason" ]; then
+          if [ -z "$reason" ] && [ -n "$unknown" ]; then
+            # Lien public mais site de parcours non reconnu : relecture humaine, sans bloquer
+            gh issue edit "$ISSUE" --remove-label "lien-vérifié" --remove-label "à-corriger" || true
+            gh issue comment "$ISSUE" --body "🤖 Vérification automatique du lien : la page s'ouvre, mais $host n'est pas un site de parcours connu (OpenRunner, Komoot, RideWithGPS, Strava itinéraire, Visorando…). Un humain va vérifier qu'il s'agit bien d'un tracé."
+            echo "Site non reconnu : $host"
+          elif [ -z "$reason" ]; then
             gh issue edit "$ISSUE" --add-label "lien-vérifié" --remove-label "à-corriger" || gh issue edit "$ISSUE" --add-label "lien-vérifié"
             echo "Lien public ✔"
           else
