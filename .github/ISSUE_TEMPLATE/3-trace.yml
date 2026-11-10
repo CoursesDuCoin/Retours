@@ -19,7 +19,7 @@ body:
     id: lien
     attributes:
       label: Lien vers le tracé
-      description: "Collez le lien du parcours (il doit s'ouvrir sans être connecté). Les parcours Komoot et RideWithGPS s'affichent en carte sur la page ; OpenRunner et Strava apparaissent en simple lien."
+      description: "Collez le lien du parcours (il doit s'ouvrir sans être connecté). Les parcours OpenRunner, Komoot et RideWithGPS s'affichent en carte sur la page ; Strava apparaît en simple lien."
       placeholder: https://…
     validations:
       required: true
