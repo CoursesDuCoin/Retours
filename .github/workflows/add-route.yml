@@ -1,0 +1,89 @@
+# Ticket « tracé » marqué « validé » par un humain : le lien est ajouté à la course sur le site.
+# Seuls OpenRunner, RideWithGPS et Komoot sont gérés (lecteur intégré sur la page course).
+# Succès : commentaire + ticket fermé. Échec : commentaire + « à-corriger », « validé » retiré.
+name: Ajout du tracé
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Numéro du ticket
+        required: true
+
+permissions:
+  issues: write
+
+jobs:
+  add:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'validé'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      ISSUE: ${{ github.event.issue.number || inputs.issue }}
+      CDC_API_KEY: ${{ secrets.CDC_API_KEY }}
+      API_BASE_URL: https://api.coursesducoin.fr
+    steps:
+      - name: Ajouter le lien
+        run: |
+          set -uo pipefail
+          json=$(gh issue view "$ISSUE" --json body,labels,state)
+          labels=$(jq -r '.labels[].name' <<<"$json")
+          if ! grep -qx 'tracé' <<<"$labels"; then
+            echo "Pas un ticket tracé, rien à faire."; exit 0
+          fi
+          if ! grep -qx 'validé' <<<"$labels"; then
+            echo "Ticket non validé, rien à faire."; exit 0
+          fi
+          body=$(jq -r '.body' <<<"$json")
+
+          # Première URL sous un titre « ### … »
+          section() {
+            awk -v h="$1" '
+              /^### / { inside = (index($0, h) > 0); next }
+              inside && /https?:\/\// { print; exit }
+            ' <<<"$body" | grep -oE 'https?://[^ )>]+' | head -n1
+          }
+
+          fail() {
+            gh issue comment "$ISSUE" --body "🤖 Ajout automatique impossible : $1"
+            gh issue edit "$ISSUE" --add-label 'à-corriger' --remove-label 'validé'
+            exit 0
+          }
+
+          course_url=$(section 'Page de la course')
+          link=$(section 'Lien vers le tracé')
+          slug=$(sed -nE 's#^https://(www\.)?coursesducoin\.fr/courses/([a-z0-9-]+).*#\2#p' <<<"$course_url")
+
+          [ -n "$slug" ] || fail "adresse de la page de la course introuvable ou invalide."
+          [ -n "$link" ] || fail "lien vers le tracé introuvable."
+
+          host=$(sed -nE 's#^https://([^/]+).*#\1#p' <<<"$link" | tr 'A-Z' 'a-z')
+          host=${host#www.}
+          case "$host" in
+            openrunner.com|ridewithgps.com|komoot.com|komoot.fr|komoot.de) ;;
+            *)
+              gh issue comment "$ISSUE" --body "🤖 Site non géré automatiquement pour l'instant (OpenRunner, RideWithGPS et Komoot seulement) : le lien doit être ajouté à la main."
+              exit 0 ;;
+          esac
+
+          payload=$(jq -nc --arg s "$slug" --arg u "$link" '[{kind: "Route", courseSlug: $s, url: $u}]')
+          response=$(curl -sS -w '\n%{http_code}' --max-time 30 \
+            -X POST "$API_BASE_URL/Link?origin=Visitor" \
+            -H "X-Api-Key: $CDC_API_KEY" -H 'Content-Type: application/json' \
+            --data "$payload") || fail "API injoignable."
+          code=$(tail -n1 <<<"$response")
+          result=$(sed '$d' <<<"$response")
+          echo "HTTP $code : $result"
+
+          [ "$code" = "200" ] || fail "l'API a répondu $code."
+          rejected=$(jq -r '.rejected | length' <<<"$result")
+          if [ "$rejected" != "0" ]; then
+            reason=$(jq -r '.rejected[0].reason' <<<"$result")
+            fail "lien refusé ($reason)."
+          fi
+
+          gh issue comment "$ISSUE" --body "✅ Ajouté : le tracé est maintenant sur https://www.coursesducoin.fr/courses/$slug"
+          gh issue close "$ISSUE" --reason completed
