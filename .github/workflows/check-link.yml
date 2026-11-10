@@ -36,6 +36,13 @@ jobs:
             *) echo "Ni tracé ni résultats : rien à vérifier"; exit 0 ;;
           esac
 
+          # Fichier GPX envoyé par le formulaire du site : déjà vérifié et stocké par l'API, rien à ouvrir
+          if gh issue view "$ISSUE" --json body --jq .body | grep -Eq 'gpx:[0-9a-f]{64}'; then
+            gh issue edit "$ISSUE" --add-label "lien-vérifié" --remove-label "à-corriger" || true
+            echo "Fichier GPX envoyé : OK"
+            exit 0
+          fi
+
           # Lien = première ligne http(s) de la section « ### Lien vers … »
           link=$(gh issue view "$ISSUE" --json body --jq .body | tr -d '\r' \
             | awk '/^### /{insec = ($0 ~ /^### Lien vers/); next} insec && /^https?:\/\//{print $1; exit}')
@@ -46,7 +53,7 @@ jobs:
           # Tracé : le lien doit mener vers un site de parcours connu
           if [ -n "$link" ] && [[ ",$labels," == *,tracé,* ]]; then
             case "$host" in
-              api.coursesducoin.fr|openrunner.com|*.openrunner.com|komoot.com|*.komoot.com|komoot.fr|*.komoot.fr|komoot.de|\
+              openrunner.com|*.openrunner.com|komoot.com|*.komoot.com|komoot.fr|*.komoot.fr|komoot.de|\
               ridewithgps.com|*.ridewithgps.com|strava.com|*.strava.com|strava.app.link|\
               visorando.com|*.visorando.com|wikiloc.com|*.wikiloc.com|alltrails.com|*.alltrails.com|\
               outdooractive.com|*.outdooractive.com|tracegps.com|*.tracegps.com|utagawavtt.com|*.utagawavtt.com|\
