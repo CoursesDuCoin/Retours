@@ -32,3 +32,6 @@
 - name: à-corriger
   color: b60205
   description: L'ajout automatique a échoué, voir le commentaire
+- name: lien-vérifié
+  color: 0e8a16
+  description: Lien ouvert sans connexion par le robot, à relire puis passer en « validé »

@@ -18,7 +18,7 @@ Indiquez l'adresse de la page de la course quand c'est possible (par ex. `https:
 ## Ce qui se passe ensuite
 
 1. Nous relisons chaque ticket.
-2. Un lien validé (résultats, tracé) est ajouté automatiquement sur la page de la course, puis le ticket est fermé avec un commentaire.
+2. Pour un tracé ou des résultats, un robot vérifie d’abord que le lien s’ouvre sans être connecté (`lien-vérifié`, sinon `à-corriger` avec une explication). Une fois relu et validé, le lien (résultats, tracé) est ajouté automatiquement sur la page de la course, puis le ticket est fermé avec un commentaire.
 3. Une erreur est corrigée à la source quand c'est possible (les données viennent des calendriers des fédérations).
 
 ## Vie privée
@@ -37,6 +37,7 @@ Indiquez l'adresse de la page de la course quand c'est possible (par ex. `https:
 | `idée` | proposition de fonctionnalité |
 | `site` | problème d'affichage ou de fonctionnement du site |
 | `autre` | le reste |
+| `lien-vérifié` | le robot a ouvert le lien sans être connecté (à relire) |
 | `validé` | relu, prêt à être ajouté automatiquement |
 | `refusé` | non retenu (raison en commentaire) |
 | `édition-seule` | le tracé ne vaut que pour cette édition, pas les suivantes |

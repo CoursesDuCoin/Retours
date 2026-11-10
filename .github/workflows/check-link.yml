@@ -1,0 +1,76 @@
+# Vérifie que le lien d'un ticket « tracé » ou « résultats » s'ouvre sans être connecté.
+# OK → étiquette « lien-vérifié » (un humain relit puis pose « validé »).
+# KO → commentaire expliquant le problème + étiquette « à-corriger ».
+name: Vérification du lien
+
+on:
+  issues:
+    types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Numéro du ticket à vérifier
+        required: true
+
+permissions:
+  issues: write
+
+concurrency:
+  group: check-link-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier le lien
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number || inputs.issue }}
+        run: |
+          set -uo pipefail
+          labels=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | join(",")')
+          case ",$labels," in
+            *,tracé,*|*,résultats,*) ;;
+            *) echo "Ni tracé ni résultats : rien à vérifier"; exit 0 ;;
+          esac
+
+          # Lien = première ligne http(s) de la section « ### Lien vers … »
+          link=$(gh issue view "$ISSUE" --json body --jq .body | tr -d '\r' \
+            | awk '/^### /{insec = ($0 ~ /^### Lien vers/); next} insec && /^https?:\/\//{print $1; exit}')
+
+          reason=""
+          if [ -z "$link" ]; then
+            reason="Aucun lien trouvé dans le ticket (il doit commencer par https://)."
+          else
+            echo "Lien : $link"
+            result=$(curl -sSL --max-time 20 --max-redirs 5 -o page.html \
+              -A "Mozilla/5.0 (compatible; CoursesDuCoinBot/1.0; +https://www.coursesducoin.fr)" \
+              -w '%{http_code} %{url_effective}' "$link" 2>/dev/null) || result="000 $link"
+            code=${result%% *}
+            final=${result#* }
+            echo "Réponse : $code $final"
+            if [ "$code" = "000" ]; then
+              reason="Le lien ne répond pas (site injoignable ou adresse incorrecte)."
+            elif [ "$code" -ge 400 ]; then
+              reason="Le lien renvoie une erreur $code (page introuvable ou privée)."
+            elif echo "$final" | grep -Eiq '/(login|signin|sign-in|connexion|session|auth|account/login)([/?#]|$)'; then
+              reason="Le lien redirige vers une page de connexion : il n'est pas public."
+            elif echo "$link" | grep -Eiq '^https?://(www\.)?strava\.com/activities/'; then
+              reason="Les activités Strava demandent une connexion pour être vues. Exportez le GPX et publiez-le sur OpenRunner, Komoot ou RideWithGPS."
+            elif grep -Eiq 'type=["'\'']?password' page.html; then
+              reason="La page demande un mot de passe : le lien n'est pas public."
+            fi
+          fi
+
+          if [ -z "$reason" ]; then
+            gh issue edit "$ISSUE" --add-label "lien-vérifié" --remove-label "à-corriger" || gh issue edit "$ISSUE" --add-label "lien-vérifié"
+            echo "Lien public ✔"
+          else
+            gh issue edit "$ISSUE" --add-label "à-corriger" --remove-label "lien-vérifié" || gh issue edit "$ISSUE" --add-label "à-corriger"
+            gh issue comment "$ISSUE" --body "🤖 Vérification automatique du lien : $reason
+
+          Vous pouvez modifier le ticket avec un lien public : la vérification sera relancée."
+            echo "Lien refusé : $reason"
+          fi
