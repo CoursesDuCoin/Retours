@@ -19,7 +19,7 @@ body:
     id: lien
     attributes:
       label: Lien vers le tracé
-      description: "Idéal : le lien d'intégration OpenRunner (Partager → Intégrer, adresse du type https://www.openrunner.com/embed.html?code=…), ou un parcours Komoot / RideWithGPS : la carte s'affichera directement sur la page de la course. Le tracé doit s'ouvrir sans être connecté (évitez les activités Strava)."
+      description: "Idéal : le lien d'intégration OpenRunner (Partager → Intégrer, adresse du type https://www.openrunner.com/embed.html?code=…), ou un parcours Komoot / RideWithGPS : la carte s'affichera directement sur la page de la course. Les liens Strava sont acceptés mais affichés comme un simple lien, sans carte."
       placeholder: https://…
     validations:
       required: true

@@ -63,9 +63,9 @@ jobs:
           host=$(sed -nE 's#^https://([^/]+).*#\1#p' <<<"$link" | tr 'A-Z' 'a-z')
           host=${host#www.}
           case "$host" in
-            openrunner.com|ridewithgps.com|komoot.com|komoot.fr|komoot.de) ;;
+            openrunner.com|ridewithgps.com|komoot.com|komoot.fr|komoot.de|strava.com) ;;
             *)
-              gh issue comment "$ISSUE" --body "🤖 Site non géré automatiquement pour l'instant (OpenRunner, RideWithGPS et Komoot seulement) : le lien doit être ajouté à la main."
+              gh issue comment "$ISSUE" --body "🤖 Site non géré automatiquement pour l'instant (OpenRunner, RideWithGPS, Komoot et Strava seulement) : le lien doit être ajouté à la main."
               exit 0 ;;
           esac
 

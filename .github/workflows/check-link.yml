@@ -73,9 +73,8 @@ jobs:
               reason="Le lien renvoie une erreur $code (page introuvable ou privée)."
             elif echo "$final" | grep -Eiq '/(login|signin|sign-in|connexion|session|auth|account/login)([/?#]|$)'; then
               reason="Le lien redirige vers une page de connexion : il n'est pas public."
-            elif echo "$link" | grep -Eiq '^https?://(www\.)?strava\.com/activities/'; then
-              reason="Les activités Strava demandent une connexion pour être vues. Exportez le GPX et publiez-le sur OpenRunner, Komoot ou RideWithGPS."
-            elif grep -Eiq 'type=["'\'']?password' page.html; then
+            # Strava : accepté tel quel (lien simple sur le site, sans carte), sa page contient un formulaire de connexion
+            elif [[ "$host" != *strava* ]] && grep -Eiq 'type=["'\'']?password' page.html; then
               reason="La page demande un mot de passe : le lien n'est pas public."
             fi
           fi
