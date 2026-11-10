@@ -19,7 +19,7 @@ body:
     id: lien
     attributes:
       label: Lien vers le tracé
-      description: Adresse publique commençant par https://
+      description: Le tracé doit être public (visible sans compte ni connexion). Adresse commençant par https://
       placeholder: https://…
     validations:
       required: true
