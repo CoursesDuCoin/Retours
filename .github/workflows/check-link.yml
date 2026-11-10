@@ -46,7 +46,7 @@ jobs:
           # Tracé : le lien doit mener vers un site de parcours connu
           if [ -n "$link" ] && [[ ",$labels," == *,tracé,* ]]; then
             case "$host" in
-              openrunner.com|*.openrunner.com|komoot.com|*.komoot.com|komoot.fr|*.komoot.fr|komoot.de|\
+              api.coursesducoin.fr|openrunner.com|*.openrunner.com|komoot.com|*.komoot.com|komoot.fr|*.komoot.fr|komoot.de|\
               ridewithgps.com|*.ridewithgps.com|strava.com|*.strava.com|strava.app.link|\
               visorando.com|*.visorando.com|wikiloc.com|*.wikiloc.com|alltrails.com|*.alltrails.com|\
               outdooractive.com|*.outdooractive.com|tracegps.com|*.tracegps.com|utagawavtt.com|*.utagawavtt.com|\
